@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Avatar from '../../components/Avatar';
+import axios from 'axios';
 
 const UserBox = ({ data }) => {
 	const router = useRouter();

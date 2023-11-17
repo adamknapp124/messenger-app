@@ -5,10 +5,11 @@ import prisma from '../../libs/prismadb';
 export async function POST(request) {
 	try {
 		const currentUser = await getCurrentUser();
+		console.log('currentUser from route.js: ', currentUser);
 		const body = await request.json();
 		const { userId, isGroup, members, name } = body;
 
-		if (!currentUser || !currentUser?.email) {
+		if (!currentUser?.id || !currentUser?.email) {
 			return new NextResponse('Unauthorized', { status: 401 });
 		}
 
@@ -17,7 +18,7 @@ export async function POST(request) {
 		}
 
 		if (isGroup) {
-			const newConversation = await new prisma.conversation.create({
+			const newConversation = await prisma.conversation.create({
 				data: {
 					name,
 					isGroup,

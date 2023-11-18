@@ -11,8 +11,6 @@ const DesktopSidebar = ({ currentUser }) => {
 	const routes = useRoutes();
 	const [isOpen, setIsOpen] = useState(false);
 
-	console.log('current user: ', currentUser);
-
 	return (
 		<>
 			<SettingsModal

@@ -8,7 +8,6 @@ import Form from './components/Form';
 
 const conversationId = async ({ params }) => {
 	const conversation = await getConversationById(params.conversationId);
-	console.log('conversation: ', conversation);
 	const messages = await getMessages(params.conversationId);
 
 	if (!conversation) {

@@ -9,6 +9,7 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Button from '../../../components/Button';
+import toast from 'react-hot-toast';
 
 const ConfirmModal = ({ isOpen, onClose }) => {
 	const router = useRouter();

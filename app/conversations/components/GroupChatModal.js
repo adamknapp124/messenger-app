@@ -4,13 +4,14 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 import Modal from '../../components/Modal';
 import Input from '../../components/inputs/Input';
 import Select from '../../components/inputs/Select';
+import Button from '../../components/Button';
 
-const Group = ({ isOpen, onClose, users }) => {
+const GroupChatModal = ({ isOpen, onClose, users }) => {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -41,7 +42,7 @@ const Group = ({ isOpen, onClose, users }) => {
 				router.refresh();
 				onClose();
 			})
-			.catch(() => toast.error('Something went wrong'))
+			.catch(() => toast.error('Something went wrong!'))
 			.finally(() => setIsLoading(false));
 	};
 
@@ -59,12 +60,12 @@ const Group = ({ isOpen, onClose, users }) => {
 						<div className="mt-10 flex flex-col gap-y-8">
 							<div>
 								<Input
-									register={register}
-									label="name"
-									id="name"
 									disabled={isLoading}
-									required
+									label="Name"
+									id="name"
 									errors={errors}
+									required
+									register={register}
 								/>
 								<Select
 									disabled={isLoading}
@@ -74,7 +75,9 @@ const Group = ({ isOpen, onClose, users }) => {
 										label: user.name,
 									}))}
 									onChange={(value) =>
-										setValue('members', value, { shouldValidate: true })
+										setValue('members', value, {
+											shouldValidate: true,
+										})
 									}
 									value={members}
 								/>
@@ -82,9 +85,21 @@ const Group = ({ isOpen, onClose, users }) => {
 						</div>
 					</div>
 				</div>
+				<div className="mt-6 flex items-center justify-end gap-x-6">
+					<Button
+						disabled={isLoading}
+						onClick={onClose}
+						type="button"
+						secondary>
+						Cancel
+					</Button>
+					<Button disabled={isLoading} type="submit">
+						Create
+					</Button>
+				</div>
 			</form>
 		</Modal>
 	);
 };
 
-export default Group;
+export default GroupChatModal;

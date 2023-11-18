@@ -1,20 +1,21 @@
 import getCurrentUser from '../../actions/getCurrentUser';
 import { NextResponse } from 'next/server';
+
+import { pusherServer } from '../../libs/pusher';
 import prisma from '../../libs/prismadb';
 
 export async function POST(request) {
 	try {
 		const currentUser = await getCurrentUser();
-		console.log('currentUser from route.js: ', currentUser);
 		const body = await request.json();
 		const { userId, isGroup, members, name } = body;
 
 		if (!currentUser?.id || !currentUser?.email) {
-			return new NextResponse('Unauthorized', { status: 401 });
+			return new NextResponse('Unauthorized', { status: 400 });
 		}
 
 		if (isGroup && (!members || members.length < 2 || !name)) {
-			return new NextResponse('Invalid Data', { status: 400 });
+			return new NextResponse('Invalid data', { status: 400 });
 		}
 
 		if (isGroup) {
@@ -33,12 +34,19 @@ export async function POST(request) {
 							},
 						],
 					},
-					// To include users in conversation, using prisma, add include { users: true } or whatever you want to include
-					include: {
-						users: true,
-					},
+				},
+				// To include users in conversation, using prisma, add include { users: true } or whatever you want to include
+				include: {
+					users: true,
 				},
 			});
+
+			newConversation.users.forEach((user) => {
+				if (user.email) {
+					pusherServer.trigger(user.email, 'conversation:new', newConversation);
+				}
+			});
+
 			return NextResponse.json(newConversation);
 		}
 
@@ -81,6 +89,12 @@ export async function POST(request) {
 			include: {
 				users: true,
 			},
+		});
+
+		newConversation.users.map((user) => {
+			if (user.email) {
+				pusherServer.trigger(user.email, 'conversation:new', newConversation);
+			}
 		});
 
 		return NextResponse.json(newConversation);

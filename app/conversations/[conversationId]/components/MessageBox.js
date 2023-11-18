@@ -1,13 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
-import Avatar from '../../../components/Avatar';
 import { format } from 'date-fns';
 import Image from 'next/image';
 
+import ImageModal from './ImageModal';
+import Avatar from '../../../components/Avatar';
+
 const MessageBox = ({ data, isLast }) => {
 	const session = useSession();
+	const [imageModalOpen, setImageModalOpen] = useState(false);
 
 	const isOwn = session?.data?.user?.email === data?.sender?.email;
 	const seenList = (data.seen || [])
@@ -27,8 +31,6 @@ const MessageBox = ({ data, isLast }) => {
 		data.image ? 'rounded-md p-0' : 'rounded-full py-2 px-3'
 	);
 
-	console.log('seenList: ', seenList);
-
 	return (
 		<div className={container}>
 			<div className={avatar}>
@@ -42,8 +44,14 @@ const MessageBox = ({ data, isLast }) => {
 					</div>
 				</div>
 				<div className={message}>
+					<ImageModal
+						src={data.image}
+						isOpen={imageModalOpen}
+						onClose={() => setImageModalOpen(false)}
+					/>
 					{data.image ? (
 						<Image
+							onClick={() => setImageModalOpen(true)}
 							alt="image"
 							height="288"
 							width="288"

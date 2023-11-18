@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 
 import getCurrentUser from '../../../../actions/getCurrentUser';
 import prisma from '../../../../libs/prismadb';
+import { pusherServer } from '../../../../libs/pusher';
 
 export async function POST(request, { params }) {
 	try {
 		const currentUser = await getCurrentUser();
-		console.log('this is the user right now: ', currentUser);
 		const { conversationId } = params;
 
 		if (!currentUser?.id || !currentUser?.email) {
@@ -56,6 +56,21 @@ export async function POST(request, { params }) {
 				},
 			},
 		});
+
+		await pusherServer.trigger(currentUser.email, 'conversation:update', {
+			id: conversationId,
+			messages: [updatedMessage],
+		});
+
+		if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+			return NextResponse.json(conversation);
+		}
+
+		await pusherServer.trigger(
+			conversationId,
+			'message:update',
+			updatedMessage
+		);
 
 		return NextResponse.json(updatedMessage);
 	} catch (error) {
